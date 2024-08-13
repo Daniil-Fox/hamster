@@ -2,21 +2,33 @@ const $circle = document.querySelector("#circle");
 const $score = document.querySelector("#score");
 const $left = document.querySelector(".left");
 const $all = document.querySelector(".all");
+
 function start() {
   setScore(getScore());
   setImage();
-  setEnergy(+$all.textContent)
+  if($all){
+    setEnergy(getEnergy())
+  }
 }
 
 function setScore(score) {
   localStorage.setItem("score", score);
   $score.textContent = score;
 }
-
+function getScore() {
+  return Number(localStorage.getItem("score")) ?? 0;
+}
 function setImage() {
   if (getScore() >= 50) {
-    $circle?.setAttribute("src", "./assets/lizzard.png");
+    $circle?.setAttribute("src", "./assets/cat.png");
   }
+}
+function setEnergy(points) {
+  localStorage.setItem("energy", points);
+  $left.textContent = points;
+}
+function getEnergy() {
+  return +localStorage.getItem("energy") ?? 10
 }
 if ($circle) {
   let MAX_ENERGY = +$all.textContent;
@@ -24,22 +36,14 @@ if ($circle) {
 
  
 
-  function getScore() {
-    return Number(localStorage.getItem("score")) ?? 0;
-  }
+
 
   function addOne() {
     setScore(getScore() + 1);
     setImage();
   }
 
-  function setEnergy(points) {
-    localStorage.setItem("energy", points);
-    $left.textContent = points;
-  }
-  function getEnergy() {
-    return +localStorage.getItem("energy") ?? 10
-  }
+  
 
   function calcEnergy() {
     if (getEnergy() - 1 < 0) {
@@ -100,8 +104,8 @@ if ($circle) {
     }
   });
 
-  start();
 }
+start();
 
 const marketItems = document.querySelectorAll(".market-item");
 if (marketItems.length > 0) {
