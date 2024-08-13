@@ -17,6 +17,8 @@ body {
   align-items: center;
   justify-content: center;
   padding-bottom: 40px;
+
+  font-family: "Roboto", sans-serif;
 }
 .site-container--market {
   display: block;
@@ -72,8 +74,8 @@ body {
 .circle {
   position: relative;
   margin-bottom: 40px;
-  width: 200px;
-  height: 200px;
+  width: 300px;
+  height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
