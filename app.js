@@ -8,8 +8,19 @@ function start() {
   setImage();
   setProfitClick(getProfitClick())
   if($all){
+    setEnergyLimit(getEnergyLimit())
     setEnergy(getEnergy())
+
+
+    $all.textContent = Math.floor(getEnergyLimit())
   }
+}
+
+function setEnergyLimit(count){
+  localStorage.setItem("energyLimit", count);
+}
+function getEnergyLimit(){
+  return localStorage.getItem("energyLimit") ?? 10;
 }
 
 function setProfitClick(count){
@@ -37,17 +48,17 @@ function setImage() {
 
 function setEnergy(points) {
   localStorage.setItem("energy", points);
-  $left.textContent = points;
+  $left.textContent = Math.floor(points);
 }
 
 function getEnergy() {
   return +localStorage.getItem("energy") ?? 10
 }
 
-let countOfEnergy = getProfitClick();
+let countOfEnergy = 3;
 
 if ($circle) {
-  let MAX_ENERGY = +$all.textContent;
+  let MAX_ENERGY = getEnergyLimit();
 
   function addOne() {
     setScore(+getScore() + +countOfEnergy);
@@ -65,14 +76,13 @@ if ($circle) {
   }
 
   function amountEnergy() {
-    if (getEnergy() + countOfEnergy < 10) {
+    if (getEnergy() + countOfEnergy < getEnergyLimit()) {
       setEnergy(getEnergy() + countOfEnergy);
-      $left.textContent = getEnergy();
     } else {
       if (getEnergy() == MAX_ENERGY) return;
       setEnergy(MAX_ENERGY);
-      $left.textContent = getEnergy();
     }
+    $left.textContent = Math.floor(getEnergy());
   }
 
   setInterval(() => {
@@ -112,11 +122,6 @@ if ($circle) {
       setTimeout(() => {
         plusOne.remove();
       }, 2000);
-
-
-
-
-      checkCosts()
     }
   });
 
@@ -145,33 +150,68 @@ if (marketItems.length > 0) {
       addBoutghtClass(item)
     } else {
       removeBoutghtClass(item)
-
-      if(infoItem.name == "boost"){
+      if(infoItem.name == "boost") {
         upLvl.addEventListener('click', e => {
+          const currItemCost = JSON.parse(localStorage.getItem('market-items'))[idx].cost
+          if(currItemCost < getScore()){
 
-          
-          setProfitClick(getProfitClick() * 1.2)
-          setScore(getScore() - infoItem.cost)
-          infoItem.lvl += 1
-          infoItem.cost = +item.querySelector('.market-item__cost span').textContent * 2
+            setProfitClick(getProfitClick() * 1.2)
+            setScore(getScore() - currItemCost)
 
-
-          const newInfo = {
-            name: marketItems[idx].name,
-            cost: infoItem.cost,
-            isActive: marketItems[idx].isActive,
-            lvl: infoItem.lvl + 1,
+            infoItem.lvl += 1
+            infoItem.cost = +item.querySelector('.market-item__cost span').textContent * 2
+  
+  
+            const newInfo = {
+              name: marketItems[idx].name,
+              cost: infoItem.cost,
+              isActive: marketItems[idx].isActive,
+              lvl: infoItem.lvl + 1,
+            }
+            replaceItem(newInfo, idx)
+  
+            item.querySelector('.market-item__lvl span').textContent = infoItem.lvl
+            item.querySelector('.market-item__cost span').textContent = item.querySelector('.market-item__cost span').textContent * 2
           }
-          marketItems.slice(idx, 1, newInfo)
+          
+        })
+      }
 
-          item.querySelector('.market-item__lvl span').textContent = infoItem.lvl
-          item.querySelector('.market-item__cost span').textContent = item.querySelector('.market-item__cost span').textContent * 2
+      if(infoItem.name == "energy") {
+        upLvl.addEventListener('click', e => {
+          const currItemCost = JSON.parse(localStorage.getItem('market-items'))[idx].cost
+          if(currItemCost < getScore()){
+
+            setEnergyLimit(getEnergyLimit() * 1.4)
+            setScore(getScore() - currItemCost)
+
+            infoItem.lvl += 1
+            infoItem.cost = +item.querySelector('.market-item__cost span').textContent * 2
+  
+  
+            const newInfo = {
+              name: marketItems[idx].name,
+              cost: infoItem.cost,
+              isActive: marketItems[idx].isActive,
+              lvl: infoItem.lvl + 1,
+            }
+            replaceItem(newInfo, idx)
+  
+            item.querySelector('.market-item__lvl span').textContent = infoItem.lvl
+            item.querySelector('.market-item__cost span').textContent = item.querySelector('.market-item__cost span').textContent * 2
+          }
+          
         })
       }
     }
 
     
   });
+
+  function replaceItem(item, position){
+    marketItems.slice(position, 1, item)
+    localStorage.setItem('market-items', JSON.stringify(marketItemsArr))
+  }
 
   function setMarketItemsCosts(item){
     marketItemsArr.push(item)
