@@ -6,40 +6,51 @@ const $all = document.querySelector(".all");
 function start() {
   setScore(getScore());
   setImage();
+  setProfitClick(getProfitClick())
   if($all){
     setEnergy(getEnergy())
   }
 }
 
-function setScore(score) {
-  localStorage.setItem("score", score);
-  $score.textContent = score;
+function setProfitClick(count){
+  localStorage.setItem("clickProfit", count);
 }
+
+function getProfitClick(){
+  return localStorage.getItem("clickProfit") ?? 1;
+}
+
+function setScore(score) {
+  localStorage.setItem("score", Math.floor(score));
+  $score.textContent = Math.floor(score);
+}
+
 function getScore() {
   return Number(localStorage.getItem("score")) ?? 0;
 }
+
 function setImage() {
   if (getScore() >= 50) {
     $circle?.setAttribute("src", "./assets/cat.png");
   }
 }
+
 function setEnergy(points) {
   localStorage.setItem("energy", points);
   $left.textContent = points;
 }
+
 function getEnergy() {
   return +localStorage.getItem("energy") ?? 10
 }
+
+let countOfEnergy = getProfitClick();
+
 if ($circle) {
   let MAX_ENERGY = +$all.textContent;
-  const countOfEnergy = 3;
-
- 
-
-
 
   function addOne() {
-    setScore(getScore() + 1);
+    setScore(+getScore() + +countOfEnergy);
     setImage();
   }
 
@@ -90,7 +101,7 @@ if ($circle) {
   
       const plusOne = document.createElement("div");
       plusOne.classList.add("plus-one");
-      plusOne.textContent = "+1";
+      plusOne.textContent = "+" + Math.floor(getProfitClick());
       plusOne.style.left = `${event.clientX - rect.left}px`;
       plusOne.style.top = `${event.clientY - rect.top}px`;
   
@@ -101,18 +112,96 @@ if ($circle) {
       setTimeout(() => {
         plusOne.remove();
       }, 2000);
+
+
+
+
+      checkCosts()
     }
   });
 
 }
 start();
 
-const marketItems = document.querySelectorAll(".market-item");
+const marketItems = [...document.querySelectorAll(".market-item")];
+
 if (marketItems.length > 0) {
-  marketItems.forEach((item) => {
+  const marketItemsArr = []
+
+  marketItems.forEach((item, idx) => {
     const upLvl = item.querySelector(".market-item__cost");
-    upLvl.addEventListener("click", (e) => {
-      alert("click");
-    });
+
+    
+
+    const infoItem = {}
+    infoItem.name = item.querySelector('.market-item__name').textContent.toLowerCase().trim()
+    infoItem.cost = +item.querySelector('.market-item__cost span').textContent
+    infoItem.lvl = +item.querySelector('.market-item__lvl span').textContent
+    infoItem.isActive = infoItem.cost < getScore()
+    
+    setMarketItemsCosts(infoItem)
+
+    if(!infoItem.isActive){
+      addBoutghtClass(item)
+    } else {
+      removeBoutghtClass(item)
+
+      if(infoItem.name == "boost"){
+        upLvl.addEventListener('click', e => {
+
+          
+          setProfitClick(getProfitClick() * 1.2)
+          setScore(getScore() - infoItem.cost)
+          infoItem.lvl += 1
+          infoItem.cost = +item.querySelector('.market-item__cost span').textContent * 2
+
+
+          const newInfo = {
+            name: marketItems[idx].name,
+            cost: infoItem.cost,
+            isActive: marketItems[idx].isActive,
+            lvl: infoItem.lvl + 1,
+          }
+          marketItems.slice(idx, 1, newInfo)
+
+          item.querySelector('.market-item__lvl span').textContent = infoItem.lvl
+          item.querySelector('.market-item__cost span').textContent = item.querySelector('.market-item__cost span').textContent * 2
+        })
+      }
+    }
+
+    
   });
+
+  function setMarketItemsCosts(item){
+    marketItemsArr.push(item)
+    localStorage.setItem('market-items', JSON.stringify(marketItemsArr))
+  }
+  
+  function getMarketCosts(){
+    return JSON.parse(localStorage.getItem('market-items')) ?? marketItemsArr;
+  }
+  
+  function checkCosts(){
+    const items = getMarketCosts()
+    items.forEach(el => {
+      if(el.cost < getScore()){
+        el.isActive = false
+      } else {
+        el.isActive = true
+      }
+    })
+  
+    localStorage.setItem('market-items', JSON.stringify(items))
+  }
 }
+function addBoutghtClass(item){
+  item.classList.add('market__item--bought')
+}
+function removeBoutghtClass(item){
+  item.classList.remove('market__item--bought')
+}
+
+
+
+
