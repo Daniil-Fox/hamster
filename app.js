@@ -61,7 +61,7 @@ if ($circle) {
   let MAX_ENERGY = getEnergyLimit();
 
   function addOne() {
-    setScore(+getScore() + +countOfEnergy);
+    setScore(+getScore() + +getProfitClick());
     setImage();
   }
 
