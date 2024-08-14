@@ -16,7 +16,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-bottom: 90px;
+  padding-bottom: 60px;
 
   font-family: "Roboto", sans-serif;
 }
@@ -126,7 +126,7 @@ body {
   z-index: 100;
   bottom: 0;
   left: 0;
-  height: 90px;
+  height: 60px;
   width: 100%;
   border-top: 1px solid #fff;
   display: flex;
